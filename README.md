@@ -31,3 +31,7 @@ See [the Phase 1 checklist](docs/PHASE-1-CHECKLIST.md) for the exact environment
 - `tests/`: Pytest unit/API tests and optional Selenium test.
 - `postman/`: importable Postman collection.
 - `.github/workflows/ci.yml`: GitHub CI workflow.
+
+## API documentation and Postman
+
+FastAPI provides interactive Swagger documentation at `http://localhost:8000/docs`. Select **Authorize** and paste `Bearer <your-JWT>` to call protected scan endpoints. Import `postman/BugSentinel.postman_collection.json` into Postman, run **Login and save JWT**, then run the scan requests in order.

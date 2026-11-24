@@ -46,3 +46,14 @@ class ScanSummary(BaseModel):
     overall_risk: str
     risk_score: int
     created_at: datetime
+
+
+class HealthResponse(BaseModel):
+    status: str
+    service: str
+
+
+class AuditResponse(BaseModel):
+    total_scans: int
+    total_users: int
+    requested_by: EmailStr

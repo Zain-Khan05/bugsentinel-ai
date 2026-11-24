@@ -1,8 +1,15 @@
 {
-  "info": { "name": "BugSentinel AI", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
-  "variable": [{ "key": "baseUrl", "value": "http://localhost:8000" }],
+  "info": { "name": "BugSentinel AI API", "description": "Run Login first; it stores the JWT for protected requests.", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:8000" }, { "key": "token", "value": "" }, { "key": "scanId", "value": "1" }],
   "item": [
     { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/health" } },
-    { "name": "Login", "request": { "method": "POST", "header": [{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw":"{\n  \"email\": \"developer@example.com\",\n  \"password\": \"ChangeMe123!\"\n}"}, "url": "{{baseUrl}}/api/v1/auth/login" } }
+    { "name": "Login and save JWT", "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.collectionVariables.set('token', body.access_token);", "pm.test('JWT returned', () => pm.expect(body.access_token).to.be.a('string'));"], "type": "text/javascript" } }], "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"developer@example.com\",\n  \"password\": \"ChangeMe123!\"\n}" }, "url": "{{baseUrl}}/api/v1/auth/login" } },
+    { "name": "Register developer", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"new.user@example.com\",\n  \"password\": \"SecurePassword123\"\n}" }, "url": "{{baseUrl}}/api/v1/auth/register" } },
+    { "name": "Current user", "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": "{{baseUrl}}/api/v1/auth/me" } },
+    { "name": "Google Sign-In", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/auth/google/login" } },
+    { "name": "Create source scan", "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.collectionVariables.set('scanId', body.id);", "pm.test('Risk report returned', () => pm.expect(body).to.have.property('overall_risk_score'));"], "type": "text/javascript" } }], "request": { "method": "POST", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"repository_name\": \"postman-demo\",\n  \"files\": [{\n    \"filename\": \"example.py\",\n    \"content\": \"def total(items):\\n    api_key = \\\"demo-secret-value\\\"\\n    return sum(items)\"\n  }]\n}" }, "url": "{{baseUrl}}/api/v1/scans" } },
+    { "name": "List scan history", "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": "{{baseUrl}}/api/v1/scans" } },
+    { "name": "Get scan detail", "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": "{{baseUrl}}/api/v1/scans/{{scanId}}" } },
+    { "name": "Admin audit (admin JWT required)", "request": { "method": "GET", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": "{{baseUrl}}/api/v1/admin/audit" } }
   ]
 }
