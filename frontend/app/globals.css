@@ -26,6 +26,11 @@ input:focus, textarea:focus { border-color: #879dff; box-shadow: 0 0 0 3px rgba(
 button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Manrope, sans-serif; }
 .login button, .scan button { display: flex; width: 100%; justify-content: space-between; margin-top: 1.4rem; padding: .82rem 1rem; background: linear-gradient(105deg, #8fa3ff, #788cf6); color: #09101e; }
 .login button:disabled, .scan button:disabled { cursor: wait; opacity: .65; }
+.login .google-button { display: flex; align-items: center; gap: .55rem; margin-top: 1rem; background: #eef3fc; color: #101525; }
+.google-button b { display: grid; width: 1.35rem; height: 1.35rem; place-items: center; border-radius: 50%; background: conic-gradient(#4285f4 0 25%, #34a853 0 50%, #fbbc05 0 75%, #ea4335 0); color: white; font-size: .72rem; }
+.google-button span { margin-left: auto; }
+.auth-divider { display: flex; align-items: center; gap: .75rem; margin: 1.2rem 0 .2rem; color: #93a0b6; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+.auth-divider::before, .auth-divider::after { flex: 1; height: 1px; content: ''; background: rgba(255,255,255,.11); }
 .login small { display: block; margin-top: 1rem; color: #93a0b6; font-size: .73rem; }
 .login .password-help { margin-top: .65rem; }
 .switch-mode { width: 100%; margin-top: .85rem; padding: .4rem; background: transparent; color: #aab7ff; font-size: .76rem; }
@@ -68,5 +73,8 @@ button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Man
 .scanrow strong { display: block; font-size: .76rem; }
 .scanrow > b { font-size: .95rem; }
 .emptytext { padding: 2rem 0; color: #93a0b6; font-size: .8rem; text-align: center; }
+.callback { display: grid; min-height: 80vh; place-items: center; }
+.callback .panel { max-width: 32rem; padding: 2rem; text-align: center; }
+.callback h1 { margin: 0; font-size: 1.35rem; }
 @media (max-width: 800px) { .shell { width: min(100% - 2rem, 680px); } .auth { grid-template-columns: 1fr; gap: 2.8rem; padding: 3rem 0; } .login { justify-self: start; } .intro { flex-direction: column; align-items: start; gap: 1rem; } .metrics, .workspace { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { .status { font-size: .65rem; } .metrics { gap: .6rem; } .scanrow { grid-template-columns: auto 1fr auto; } .scanrow > span:last-child { display: none; } }

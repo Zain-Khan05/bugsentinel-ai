@@ -32,3 +32,20 @@ def test_registration_requires_a_strong_password():
     with TestClient(app) as client:
         response = client.post("/api/v1/auth/register", json={"email": "weak@example.com", "password": "weakpassword"})
         assert response.status_code == 422
+
+
+def test_google_oauth_requires_configuration(monkeypatch):
+    monkeypatch.delenv("GOOGLE_CLIENT_ID", raising=False)
+    monkeypatch.delenv("GOOGLE_CLIENT_SECRET", raising=False)
+    with TestClient(app) as client:
+        response = client.get("/api/v1/auth/google/login", follow_redirects=False)
+        assert response.status_code == 503
+
+
+def test_google_oauth_redirects_when_configured(monkeypatch):
+    monkeypatch.setenv("GOOGLE_CLIENT_ID", "test-client-id")
+    monkeypatch.setenv("GOOGLE_CLIENT_SECRET", "test-client-secret")
+    with TestClient(app) as client:
+        response = client.get("/api/v1/auth/google/login", follow_redirects=False)
+        assert response.status_code == 302
+        assert response.headers["location"].startswith("https://accounts.google.com/o/oauth2/v2/auth?")

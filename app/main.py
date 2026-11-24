@@ -1,11 +1,16 @@
 import json
 import os
+import secrets
+from urllib.parse import quote
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 from .analyzer import analyze_project
 from .database import Base, SessionLocal, engine, get_db
 from .models import Scan, User
+from .google_oauth import authenticate_callback, authorization_url
 from .schemas import CurrentUserResponse, LoginRequest, RegisterRequest, ScanRequest, ScanSummary, TokenResponse
 from .security import create_access_token, get_current_user, hash_password, require_admin, verify_password
 
@@ -15,6 +20,11 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost", "https://l
 @app.on_event("startup")
 def initialise_database():
     Base.metadata.create_all(bind=engine)
+    inspector = inspect(engine)
+    if "google_id" not in {column["name"] for column in inspector.get_columns("users")}:
+        with engine.begin() as connection:
+            connection.execute(text("ALTER TABLE users ADD COLUMN google_id VARCHAR(255)"))
+            connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_google_id ON users (google_id)"))
     db = SessionLocal()
     try:
         for email, password, role in [("admin@example.com", os.getenv("ADMIN_PASSWORD", "ChangeMe123!"), "admin"), ("developer@example.com", os.getenv("DEVELOPER_PASSWORD", "ChangeMe123!"), "developer")]:
@@ -44,6 +54,25 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 @app.get("/api/v1/auth/me", response_model=CurrentUserResponse, tags=["authentication"])
 def current_user(user: User = Depends(get_current_user)):
     return CurrentUserResponse(email=user.email, role=user.role)
+
+@app.get("/api/v1/auth/google/login", tags=["authentication"])
+def google_login():
+    return RedirectResponse(authorization_url(), status_code=status.HTTP_302_FOUND)
+
+@app.get("/api/v1/auth/google/callback", tags=["authentication"])
+def google_callback(code: str, state: str, db: Session = Depends(get_db)):
+    identity, frontend_url = authenticate_callback(code, state)
+    user = db.query(User).filter(User.google_id == identity["google_id"]).first()
+    if not user:
+        user = db.query(User).filter(User.email == identity["email"]).first()
+        if user:
+            user.google_id = identity["google_id"]
+        else:
+            user = User(email=identity["email"], google_id=identity["google_id"], password_hash=hash_password(secrets.token_urlsafe(32)), role="developer")
+            db.add(user)
+        db.commit()
+    token = create_access_token(user.email, user.role)
+    return RedirectResponse(f"{frontend_url}/oauth/callback?token={quote(token, safe='')}", status_code=status.HTTP_302_FOUND)
 
 @app.post("/api/v1/scans", tags=["scans"])
 def create_scan(payload: ScanRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):

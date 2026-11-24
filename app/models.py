@@ -9,6 +9,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(30), default="developer")
+    google_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
 
 class Scan(Base):
     __tablename__ = "scans"
