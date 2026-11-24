@@ -6,6 +6,9 @@ node_modules/
 .next/
 *.tsbuildinfo
 coverage/
+htmlcov/
+coverage.xml
+test-results.xml
 __pycache__/
 .pytest_cache/
 *.pyc
