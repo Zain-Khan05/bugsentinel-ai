@@ -1,0 +1,36 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://bugsentinel:bugsentinel@db:5432/bugsentinel
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: ""
+    depends_on: [api]
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bugsentinel
+      POSTGRES_USER: bugsentinel
+      POSTGRES_PASSWORD: bugsentinel
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bugsentinel -d bugsentinel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  nginx:
+    image: nginx:1.27-alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on: [api, frontend]
+volumes:
+  postgres_data:
