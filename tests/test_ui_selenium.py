@@ -10,7 +10,7 @@ def test_dashboard_login():
     try:
         driver.get(os.getenv("APP_URL", "https://localhost"))
         driver.find_element(By.ID, "email").clear()
-        driver.find_element(By.ID, "email").send_keys("developer@bugsentinel.local")
+        driver.find_element(By.ID, "email").send_keys("developer@example.com")
         driver.find_element(By.ID, "password").send_keys("ChangeMe123!")
         driver.find_element(By.TAG_NAME, "button").click()
         assert "New source scan" in driver.page_source
