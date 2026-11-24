@@ -60,6 +60,15 @@ button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Man
 .score strong { display: block; margin-top: .2rem; font-size: 2.15rem; letter-spacing: -.08em; }
 .score > b, .scanrow > span:last-child { font: 500 .65rem 'DM Mono', monospace; text-transform: uppercase; }
 .summary { display: flex; justify-content: space-between; padding: .85rem 0; }
+.analysis-insights { margin-bottom: .4rem; }
+.insight-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: .35rem; margin-bottom: .7rem; }
+.insight-summary span, .prediction-card, .metrics-details { padding: .55rem; border: 1px solid rgba(255,255,255,.09); border-radius: .45rem; color: #b8c4d9; font-size: .64rem; }
+.prediction-card p { margin: 0 0 .3rem; color: #91a5ff; font: 500 .58rem 'DM Mono', monospace; }
+.prediction-card strong { font-size: .7rem; }
+.prediction-card ul { margin: .35rem 0 0; padding-left: 1rem; color: #93a0b6; font-size: .65rem; line-height: 1.55; }
+.metrics-details { margin-top: .55rem; }
+.metrics-details summary { cursor: pointer; color: #aab7ff; font-size: .68rem; }
+.metrics-details div { display: flex; justify-content: space-between; gap: .4rem; margin-top: .55rem; font-size: .62rem; }
 .finding { display: flex; gap: .65rem; padding: .75rem 0; border-top: 1px solid rgba(255,255,255,.11); }
 .finding > span, .scanrow > span:last-child { height: fit-content; padding: .25rem .4rem; border-radius: .3rem; }
 .finding strong, .finding small { display: block; font-size: .72rem; }
