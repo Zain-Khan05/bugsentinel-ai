@@ -13,7 +13,7 @@ Open `https://localhost` (accept the local certificate warning) or `https://loca
 
 Docker Desktop must be running. The Nginx HTTPS configuration expects local certificate files in `nginx/certs/`; do not commit certificates or `.env` files.
 
-For frontend-only development, run `npm install` and `npm run dev` from the `frontend` folder. The Next.js UI expects the FastAPI API at `http://localhost:8000` when run separately; set `NEXT_PUBLIC_API_URL=http://localhost:8000` before starting it.
+For frontend development, run `npm install` and `npm run dev` from the `frontend` folder. Next.js proxies `/api/*` requests to FastAPI at `http://localhost:8000` by default; set the local `BACKEND_API_URL` environment variable only if your backend uses another address.
 
 ## Local development architecture
 
