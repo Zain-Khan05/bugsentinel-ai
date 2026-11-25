@@ -1,9 +1,8 @@
 pipeline {
-  agent { label 'linux && docker' }
+  agent any
 
   options {
     timestamps()
-    ansiColor('xterm')
     buildDiscarder(logRotator(numToKeepStr: '20'))
     disableConcurrentBuilds()
     timeout(time: 30, unit: 'MINUTES')
@@ -19,25 +18,42 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'git rev-parse --short HEAD'
+        script {
+          if (isUnix()) {
+            sh 'git rev-parse --short HEAD'
+          } else {
+            bat 'git rev-parse --short HEAD'
+          }
+        }
       }
     }
 
     stage('Backend: install and test') {
       steps {
-        sh '''#!/bin/sh
-          python3 -m venv .jenkins-venv
-          . .jenkins-venv/bin/activate
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pytest tests/test_analyzer.py tests/test_api.py \\
-            --cov=app --cov-report=xml --junitxml=test-results.xml
-        '''
+        script {
+          if (isUnix()) {
+            sh '''#!/bin/sh
+              python3 -m venv .jenkins-venv
+              . .jenkins-venv/bin/activate
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements.txt
+              python -m pytest tests/test_analyzer.py tests/test_api.py \\
+                --cov=app --cov-report=xml --junitxml=test-results.xml
+            '''
+          } else {
+            bat '''@echo on
+              py -3 -m venv .jenkins-venv
+              call .jenkins-venv\\Scripts\\activate.bat
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements.txt
+              python -m pytest tests/test_analyzer.py tests/test_api.py --cov=app --cov-report=xml --junitxml=test-results.xml
+            '''
+          }
+        }
       }
       post {
         always {
           junit allowEmptyResults: true, testResults: 'test-results.xml'
-          publishCoverage adapters: [coberturaAdapter('coverage.xml')], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
         }
       }
     }
@@ -45,34 +61,56 @@ pipeline {
     stage('Frontend: verify') {
       steps {
         dir('frontend') {
-          sh 'npm ci'
-          sh 'npm run typecheck'
-          sh 'npm run build'
+          script {
+            if (isUnix()) {
+              sh 'npm ci && npm run typecheck && npm run build'
+            } else {
+              bat 'call npm ci && call npm run typecheck && call npm run build'
+            }
+          }
         }
       }
     }
 
     stage('Docker Compose: validate') {
       steps {
-        sh 'docker compose config --quiet'
+        script {
+          if (isUnix()) {
+            sh 'docker compose config --quiet'
+          } else {
+            bat 'docker compose config --quiet'
+          }
+        }
       }
     }
 
     stage('Docker: build API image') {
       steps {
-        sh 'docker build --pull -t $IMAGE_NAME:$IMAGE_TAG .'
+        script {
+          if (isUnix()) {
+            sh 'docker build --pull -t $IMAGE_NAME:$IMAGE_TAG .'
+          } else {
+            bat 'docker build --pull -t %IMAGE_NAME%:%IMAGE_TAG% .'
+          }
+        }
       }
     }
 
     stage('Security: container scan') {
       steps {
-        sh '''#!/bin/sh
-          docker run --rm \\
-            -v /var/run/docker.sock:/var/run/docker.sock \\
-            aquasec/trivy:0.58.1 image \\
-            --severity HIGH,CRITICAL --exit-code 0 --no-progress \\
-            $IMAGE_NAME:$IMAGE_TAG
-        '''
+        script {
+          if (isUnix()) {
+            sh '''#!/bin/sh
+              docker run --rm \\
+                -v /var/run/docker.sock:/var/run/docker.sock \\
+                aquasec/trivy:0.58.1 image \\
+                --severity HIGH,CRITICAL --exit-code 0 --no-progress \\
+                $IMAGE_NAME:$IMAGE_TAG
+            '''
+          } else {
+            bat 'docker run --rm aquasec/trivy:0.58.1 image --severity HIGH,CRITICAL --exit-code 0 --no-progress %IMAGE_NAME%:%IMAGE_TAG%'
+          }
+        }
       }
     }
 
@@ -96,7 +134,13 @@ pipeline {
   post {
     always {
       archiveArtifacts artifacts: 'coverage.xml,test-results.xml', allowEmptyArchive: true
-      sh 'rm -rf .jenkins-venv || true'
+      script {
+        if (isUnix()) {
+          sh 'rm -rf .jenkins-venv || true'
+        } else {
+          bat 'if exist .jenkins-venv rmdir /s /q .jenkins-venv'
+        }
+      }
     }
     success {
       echo 'CI pipeline completed successfully.'

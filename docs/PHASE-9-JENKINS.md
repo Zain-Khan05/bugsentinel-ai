@@ -26,13 +26,13 @@ The Selenium suite is intentionally not part of every Jenkins run because it nee
 
 ## Jenkins prerequisites
 
-Use a Linux Jenkins agent with these tools available to the Jenkins user:
+Use a Jenkins agent with these tools available to the Jenkins service account:
 
 - Git
 - Python 3.12 or newer and `venv`
 - Node.js 20 and npm
 - Docker Engine with Docker Compose v2
-- permission to use `/var/run/docker.sock`
+- permission to run Docker commands
 
 Install Jenkins plugins:
 
@@ -40,8 +40,8 @@ Install Jenkins plugins:
 - Git
 - GitHub Branch Source
 - JUnit
-- Coverage (provides `publishCoverage`)
-- ANSI Color
+
+On Windows, ensure `py`, `npm`, `git`, and `docker` are available in the Jenkins service account's PATH. The pipeline supports both Windows and Linux agents.
 
 ## Jenkins job setup
 
@@ -71,7 +71,7 @@ For local Jenkins, use **Build Now**. GitHub cannot send webhooks to `localhost`
 
 - [ ] Jenkins discovers the `zk` branch.
 - [ ] A `zk` build completes successfully.
-- [ ] Jenkins shows JUnit results and `coverage.xml` as an artifact.
+- [ ] Jenkins shows JUnit results and `coverage.xml` as an archived artifact.
 - [ ] Backend test, frontend verify, Compose validation and Docker build stages are green.
 - [ ] Trivy scan runs and is visible in the console log.
 - [ ] A push to `zk` triggers Jenkins after the webhook is configured publicly.
