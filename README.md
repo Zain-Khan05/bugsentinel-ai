@@ -25,6 +25,7 @@ Docker deployment: Nginx (localhost:8081) → Next.js / FastAPI → PostgreSQL
 See [the Phase 1 checklist](docs/PHASE-1-CHECKLIST.md) for the exact environment, dependency, Git, and GitHub setup steps.
 See [the Docker guide](docs/PHASE-8-DOCKER.md) for container setup and verification.
 See [the Jenkins guide](docs/PHASE-9-JENKINS.md) for CI/CD setup, branch promotion and webhook verification.
+See [the security hardening guide](docs/PHASE-10-SECURITY.md) for implemented controls, scanning policy and verification.
 
 ## Capstone evidence
 

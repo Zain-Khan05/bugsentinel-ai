@@ -4,6 +4,7 @@ import secrets
 from urllib.parse import quote
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import RedirectResponse
 from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
@@ -26,7 +27,19 @@ app = FastAPI(
         {"name": "administration", "description": "Administrator-only audit information."},
     ],
 )
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost", "https://localhost", "http://localhost:3000", "http://localhost:8081"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+allowed_hosts = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver,api").split(",") if host.strip()]
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost", "https://localhost", "http://localhost:3000", "http://localhost:8081"], allow_credentials=True, allow_methods=["GET", "POST", "OPTIONS"], allow_headers=["Authorization", "Content-Type"])
+
+@app.middleware("http")
+async def add_api_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), geolocation=(), microphone=()"
+    response.headers["Cache-Control"] = "no-store" if request.url.path.startswith("/api/") else "no-cache"
+    return response
 
 @app.on_event("startup")
 def initialise_database():

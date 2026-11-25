@@ -61,8 +61,18 @@ def test_google_oauth_redirects_when_configured(monkeypatch):
 
 def test_protected_routes_reject_missing_and_invalid_jwts():
     with TestClient(app) as client:
-        assert client.get("/api/v1/scans").status_code == 403
+        assert client.get("/api/v1/scans").status_code == 401
         assert client.get("/api/v1/scans", headers=authorization("not-a-valid-jwt")).status_code == 401
+
+
+def test_api_security_headers_and_untrusted_host_rejection():
+    with TestClient(app) as client:
+        health = client.get("/api/v1/health")
+        assert health.headers["x-content-type-options"] == "nosniff"
+        assert health.headers["x-frame-options"] == "DENY"
+        assert health.headers["permissions-policy"] == "camera=(), geolocation=(), microphone=()"
+        rejected = client.get("/api/v1/health", headers={"host": "untrusted.example"})
+        assert rejected.status_code == 400
 
 
 def test_scan_history_is_isolated_between_developers():

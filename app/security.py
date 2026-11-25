@@ -2,7 +2,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+import jwt
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
@@ -27,7 +28,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_
     denied = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired access token")
     try:
         email = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"]).get("sub")
-    except JWTError as error:
+    except InvalidTokenError as error:
         raise denied from error
     user = db.query(User).filter(User.email == email).first()
     if not user:
