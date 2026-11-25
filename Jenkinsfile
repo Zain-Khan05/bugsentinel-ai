@@ -76,9 +76,24 @@ pipeline {
       steps {
         script {
           if (isUnix()) {
-            sh 'docker compose config --quiet'
+            sh '''#!/bin/sh
+              printf 'JWT_SECRET=ci-placeholder-not-a-real-secret\nPOSTGRES_PASSWORD=ci-placeholder\n' > .env
+              docker compose config --quiet
+              result=$?
+              rm -f .env
+              exit $result
+            '''
           } else {
-            bat 'docker compose config --quiet'
+            bat '''@echo off
+              (
+                echo JWT_SECRET=ci-placeholder-not-a-real-secret
+                echo POSTGRES_PASSWORD=ci-placeholder
+              ) > .env
+              docker compose config --quiet
+              set result=%ERRORLEVEL%
+              del /q .env
+              exit /b %result%
+            '''
           }
         }
       }

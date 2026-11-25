@@ -24,6 +24,8 @@ The root `Jenkinsfile` runs these stages:
 
 The Selenium suite is intentionally not part of every Jenkins run because it needs a real browser and running web services. It remains a separate Phase 7 end-to-end check.
 
+The Compose validation stage creates a short-lived `.env` with placeholder values, validates the configuration, then deletes it. Jenkins never needs, reads or stores the real local `.env` or OAuth secrets.
+
 ## Jenkins prerequisites
 
 Use a Jenkins agent with these tools available to the Jenkins service account:
