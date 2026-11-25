@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { AnalysisInsights } from './components/analysis-insights';
 import { CodeReview } from './components/code-review';
-
 type Scan = { id: number; repository_name: string; overall_risk: string; risk_score: number; created_at: string };
 type Report = { overall_risk_score: number; overall_risk_level: string; security_findings: number; summary: { files_analyzed: number; total_lines_of_code: number; average_complexity: number; quality_findings: number }; files: { filename: string; language: string; risk_score: number; risk_level: string; metrics: { lines_of_code: number; function_count: number; cyclomatic_complexity: number; duplicate_lines: number; todo_count: number }; prediction: { model: string; contributing_factors: string[] }; findings: Finding[] }[] };
 type Finding = { severity: string; category: string; line: number; message: string };
@@ -11,7 +10,6 @@ type AuthResponse = { access_token: string; token_type: string; email: string; r
 type Session = Pick<AuthResponse, 'email' | 'role'>;
 type SourceFilePayload = { filename: string; content: string };
 type SavedScanDetail = Report & { repository_name: string; source_files: SourceFilePayload[] };
-
 const api = process.env.NEXT_PUBLIC_API_URL || '';
 const riskClass = (risk: string) => `risk-${risk || 'low'}`;
 const supportedExtensions = ['.py', '.js', '.jsx', '.ts', '.tsx', '.java'];
