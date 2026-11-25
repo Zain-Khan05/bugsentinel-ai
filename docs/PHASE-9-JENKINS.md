@@ -19,12 +19,14 @@ The root `Jenkinsfile` runs these stages:
 3. Install frontend dependencies with `npm ci`, type-check and build Next.js.
 4. Validate `docker-compose.yml` syntax.
 5. Build the FastAPI Docker image.
-6. Scan the image with Trivy for high/critical vulnerabilities.
+6. Export the image temporarily and scan it with Trivy for high/critical vulnerabilities.
 7. Print the correct promotion action for `zk`, `staging`, or `master`.
 
 The Selenium suite is intentionally not part of every Jenkins run because it needs a real browser and running web services. It remains a separate Phase 7 end-to-end check.
 
 The Compose validation stage creates a short-lived `.env` with placeholder values, validates the configuration, then deletes it. Jenkins never needs, reads or stores the real local `.env` or OAuth secrets.
+
+The Trivy stage exports the local image to a temporary tar file, scans that file, and deletes it. This avoids mounting the Docker daemon socket into a scanner container, which is required for reliable local scanning on Windows and is safer than giving the scanner direct Docker-daemon access.
 
 ## Jenkins prerequisites
 

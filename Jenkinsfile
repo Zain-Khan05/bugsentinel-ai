@@ -116,14 +116,25 @@ pipeline {
         script {
           if (isUnix()) {
             sh '''#!/bin/sh
+              docker save -o bugsentinel-image.tar $IMAGE_NAME:$IMAGE_TAG
               docker run --rm \\
-                -v /var/run/docker.sock:/var/run/docker.sock \\
+                -v "$PWD:/workspace" \\
                 aquasec/trivy:0.58.1 image \\
-                --severity HIGH,CRITICAL --exit-code 0 --no-progress \\
-                $IMAGE_NAME:$IMAGE_TAG
+                --input /workspace/bugsentinel-image.tar \\
+                --severity HIGH,CRITICAL --exit-code 0 --no-progress
+              result=$?
+              rm -f bugsentinel-image.tar
+              exit $result
             '''
           } else {
-            bat 'docker run --rm aquasec/trivy:0.58.1 image --severity HIGH,CRITICAL --exit-code 0 --no-progress %IMAGE_NAME%:%IMAGE_TAG%'
+            bat '''@echo off
+              docker save -o bugsentinel-image.tar %IMAGE_NAME%:%IMAGE_TAG%
+              if errorlevel 1 exit /b 1
+              docker run --rm -v "%CD%:/workspace" aquasec/trivy:0.58.1 image --input /workspace/bugsentinel-image.tar --severity HIGH,CRITICAL --exit-code 0 --no-progress
+              set result=%ERRORLEVEL%
+              del /q bugsentinel-image.tar
+              exit /b %result%
+            '''
           }
         }
       }
