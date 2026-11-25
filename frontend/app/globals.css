@@ -102,9 +102,34 @@ button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Man
 .open-scan { padding: .42rem .6rem; background: rgba(143,163,255,.13); color: #cdd6f4; font-size: .7rem; }
 .open-scan:hover:not(:disabled) { background: rgba(143,163,255,.25); }
 .open-scan:disabled { cursor: wait; opacity: .65; }
+.code-review { margin-top: 1rem; padding: 1.45rem; border: 1px solid rgba(255,255,255,.11); border-radius: 1.15rem; background: linear-gradient(145deg, rgba(26,37,64,.87), rgba(18,26,45,.82)); box-shadow: 0 24px 60px rgba(0,0,0,.18); }
+.code-review-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.code-review-heading h3 { margin: 0; font-size: 1.15rem; letter-spacing: -.03em; }
+.code-review-heading > span { padding: .3rem .45rem; border-radius: .35rem; background: rgba(148,167,255,.11); color: #bfcaff; font: .62rem 'DM Mono', monospace; }
+.file-tabs { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1rem 0 .75rem; }
+.file-tabs button { padding: .45rem .65rem; border: 1px solid rgba(143,163,255,.25); background: rgba(8,13,25,.6); color: #aebad1; font: .68rem 'DM Mono', monospace; }
+.file-tabs button.active { border-color: #92a5ff; background: rgba(143,163,255,.2); color: #eef3fc; }
+.code-legend { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: .8rem 0; color: #93a0b6; font-size: .66rem; }
+.code-legend > span { padding: .2rem .38rem; border-radius: .3rem; font: .58rem 'DM Mono', monospace; text-transform: uppercase; }
+.legend-high { color: #ffb0ba; background: rgba(250,140,155,.2); }
+.legend-medium { color: #f7d89c; background: rgba(240,198,116,.18); }
+.legend-low { color: #95e4bf; background: rgba(101,212,165,.18); }
+.code-legend small { margin-left: auto; }
+.code-frame { overflow-x: auto; border: 1px solid rgba(255,255,255,.1); border-radius: .7rem; background: #090f1d; font: .76rem 'DM Mono', monospace; line-height: 1.55; }
+.code-line { display: grid; grid-template-columns: 3rem minmax(max-content, 1fr); min-width: max-content; border-left: 3px solid transparent; }
+.code-line code { padding: .25rem .75rem .25rem 0; color: #dce5f8; white-space: pre; }
+.line-number { padding: .25rem .7rem; color: #5f6e8d; text-align: right; user-select: none; }
+.code-line.flagged { grid-template-columns: 3rem minmax(max-content, 1fr) minmax(12rem, .9fr); }
+.flagged-high { border-left-color: #fa8c9b; background: rgba(250,140,155,.12); }
+.flagged-medium { border-left-color: #f0c674; background: rgba(240,198,116,.10); }
+.flagged-low { border-left-color: #65d4a5; background: rgba(101,212,165,.1); }
+.line-flags { display: flex; flex-direction: column; gap: .2rem; padding: .25rem .55rem; border-left: 1px solid rgba(255,255,255,.08); color: #cdd8ed; font-size: .61rem; white-space: normal; }
+.line-flags span { overflow-wrap: anywhere; }
+.code-note, .empty-review p { margin: .8rem 0 0; color: #93a0b6; font-size: .73rem; }
+.empty-review strong { display: block; color: #cbd6ec; }
 .emptytext { padding: 2rem 0; color: #93a0b6; font-size: .8rem; text-align: center; }
 .callback { display: grid; min-height: 80vh; place-items: center; }
 .callback .panel { max-width: 32rem; padding: 2rem; text-align: center; }
 .callback h1 { margin: 0; font-size: 1.35rem; }
-@media (max-width: 800px) { .shell { width: min(100% - 2rem, 680px); } .auth { grid-template-columns: 1fr; gap: 2.8rem; padding: 3rem 0; } .login { justify-self: start; } .intro { flex-direction: column; align-items: start; gap: 1rem; } .metrics, .workspace { grid-template-columns: 1fr; } }
+@media (max-width: 800px) { .shell { width: min(100% - 2rem, 680px); } .auth { grid-template-columns: 1fr; gap: 2.8rem; padding: 3rem 0; } .login { justify-self: start; } .intro { flex-direction: column; align-items: start; gap: 1rem; } .metrics, .workspace { grid-template-columns: 1fr; } .code-legend small { width: 100%; margin-left: 0; } }
 @media (max-width: 480px) { .status { font-size: .65rem; } .metrics { gap: .6rem; } .scanrow { grid-template-columns: auto 1fr auto; } .scanrow > span:last-child { display: none; } }

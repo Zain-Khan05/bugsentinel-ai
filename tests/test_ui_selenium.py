@@ -64,6 +64,9 @@ def test_code_submission_displays_risk_report(driver):
     report = wait_for(driver, (By.XPATH, "//*[contains(., 'OVERALL RISK SCORE')]"))
     assert "Why this score" in driver.page_source
     assert report.is_displayed()
+    highlighted_code = driver.find_element(By.CSS_SELECTOR, "[data-testid='code-review']")
+    assert highlighted_code.is_displayed()
+    assert "Possible hard-coded secret" in highlighted_code.text
 
 
 def test_logout_returns_to_login_screen(driver):
