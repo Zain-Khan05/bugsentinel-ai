@@ -24,10 +24,11 @@ Docker deployment: Nginx (localhost:8081) → Next.js / FastAPI → PostgreSQL
 
 See [the Phase 1 checklist](docs/PHASE-1-CHECKLIST.md) for the exact environment, dependency, Git, and GitHub setup steps.
 See [the Docker guide](docs/PHASE-8-DOCKER.md) for container setup and verification.
+See [the Jenkins guide](docs/PHASE-9-JENKINS.md) for CI/CD setup, branch promotion and webhook verification.
 
 ## Capstone evidence
 
-- `Jenkinsfile`: testing, SAST, Docker build/scan stages.
+- `Jenkinsfile`: backend tests, frontend verification, Docker build and Trivy container scanning.
 - `docker-compose.yml`: API, PostgreSQL, Nginx and HTTPS.
 - `tests/`: Pytest unit/API tests and optional Selenium test.
 - `postman/`: importable Postman collection.
