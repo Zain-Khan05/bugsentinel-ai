@@ -35,6 +35,12 @@ button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Man
 .login .password-help { margin-top: .65rem; }
 .switch-mode { width: 100%; margin-top: .85rem; padding: .4rem; background: transparent; color: #aab7ff; font-size: .76rem; }
 .error { color: #fa8c9b; font-size: .78rem; }
+.success { color: #65d4a5; font-size: .78rem; line-height: 1.5; }
+.account-security { margin: 0 0 1rem; padding: 1.45rem; }
+.account-security .muted { margin: -.55rem 0 1rem; font-size: .8rem; }
+.password-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
+.password-fields label { display: block; margin: 0 0 .42rem; color: #c0cadd; font-size: .78rem; font-weight: 700; }
+.password-submit { margin-top: 1rem; padding: .75rem 1rem; background: linear-gradient(105deg, #8fa3ff, #788cf6); color: #09101e; }
 .intro { display: flex; align-items: end; justify-content: space-between; margin: 4.25rem 0 2rem; }
 .intro h1 { font-size: clamp(2rem, 4vw, 3.3rem); }
 .intro .muted { margin: .5rem 0 0; font-size: .92rem; }

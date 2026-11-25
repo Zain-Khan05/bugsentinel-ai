@@ -12,7 +12,7 @@ from .analyzer import analyze_project
 from .database import Base, SessionLocal, engine, get_db
 from .models import Scan, User
 from .google_oauth import authenticate_callback, authorization_url
-from .schemas import AuditResponse, CurrentUserResponse, HealthResponse, LoginRequest, RegisterRequest, ScanRequest, ScanSummary, TokenResponse
+from .schemas import AuditResponse, ChangePasswordRequest, CurrentUserResponse, HealthResponse, LoginRequest, RegisterRequest, ScanRequest, ScanSummary, TokenResponse
 from .security import create_access_token, get_current_user, hash_password, require_admin, verify_password
 
 app = FastAPI(
@@ -74,6 +74,17 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     return TokenResponse(access_token=create_access_token(user.email, user.role), email=user.email, role=user.role)
+
+
+@app.post("/api/v1/auth/change-password", tags=["authentication"], summary="Change the current user's password", responses={401: {"description": "Current password is incorrect"}})
+def change_password(payload: ChangePasswordRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not verify_password(payload.current_password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect")
+    if verify_password(payload.password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Choose a different password")
+    user.password_hash = hash_password(payload.password)
+    db.commit()
+    return {"message": "Password changed successfully."}
 
 @app.get("/api/v1/auth/me", response_model=CurrentUserResponse, tags=["authentication"], summary="Get the current JWT user", responses={401: {"description": "JWT is missing, expired, or invalid"}})
 def current_user(user: User = Depends(get_current_user)):

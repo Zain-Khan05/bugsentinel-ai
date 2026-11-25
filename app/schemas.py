@@ -21,6 +21,22 @@ class RegisterRequest(BaseModel):
             raise ValueError("Password must contain a number")
         return password
 
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=8, max_length=128)
+    password: str = Field(min_length=12, max_length=128)
+
+    @field_validator("password")
+    @classmethod
+    def enforce_password_strength(cls, password: str) -> str:
+        if not any(character.islower() for character in password):
+            raise ValueError("Password must contain a lowercase letter")
+        if not any(character.isupper() for character in password):
+            raise ValueError("Password must contain an uppercase letter")
+        if not any(character.isdigit() for character in password):
+            raise ValueError("Password must contain a number")
+        return password
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

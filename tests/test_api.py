@@ -42,6 +42,19 @@ def test_registration_requires_a_strong_password():
         assert response.status_code == 422
 
 
+def test_change_password_requires_current_password_and_updates_password():
+    with TestClient(app) as client:
+        email, _ = register_developer(client)
+        original = "SecurePassword123"
+        login = client.post("/api/v1/auth/login", json={"email": email, "password": original})
+        token = login.json()["access_token"]
+        wrong_current = client.post("/api/v1/auth/change-password", headers=authorization(token), json={"current_password": "WrongPassword123", "password": "NewSecurePassword123"})
+        assert wrong_current.status_code == 401
+        changed = client.post("/api/v1/auth/change-password", headers=authorization(token), json={"current_password": original, "password": "NewSecurePassword123"})
+        assert changed.status_code == 200
+        assert client.post("/api/v1/auth/login", json={"email": email, "password": "NewSecurePassword123"}).status_code == 200
+
+
 def test_google_oauth_requires_configuration(monkeypatch):
     monkeypatch.delenv("GOOGLE_CLIENT_ID", raising=False)
     monkeypatch.delenv("GOOGLE_CLIENT_SECRET", raising=False)
