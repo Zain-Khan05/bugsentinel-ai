@@ -101,7 +101,7 @@ def change_password(payload: ChangePasswordRequest, user: User = Depends(get_cur
 def current_user(user: User = Depends(get_current_user)):
     return CurrentUserResponse(email=user.email, role=user.role)
 
-@app.get("/api/v1/auth/google/login", tags=["authentication"], summary="Start Google Sign-In", response_description="Redirects to Google OAuth")
+@app.get("/api/v1/auth/google/login", tags=["authentication"], summary="Start Google Sign-In", status_code=status.HTTP_302_FOUND, response_description="Redirects the browser to Google OAuth", responses={302: {"description": "Browser redirect to Google OAuth"}, 503: {"description": "Google OAuth is not configured"}})
 def google_login():
     return RedirectResponse(authorization_url(), status_code=status.HTTP_302_FOUND)
 
