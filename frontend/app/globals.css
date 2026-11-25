@@ -67,6 +67,18 @@ button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Man
 .score > b, .scanrow > span:last-child { font: 500 .65rem 'DM Mono', monospace; text-transform: uppercase; }
 .summary { display: flex; justify-content: space-between; padding: .85rem 0; }
 .analysis-insights { margin-bottom: .4rem; }
+.download-report { width: 100%; margin: .8rem 0 .25rem; padding: .72rem .85rem; border: 1px solid rgba(143,163,255,.42); background: rgba(143,163,255,.12); color: #dfe5ff; transition: background .18s ease, border-color .18s ease; }
+.download-report:hover:not(:disabled) { border-color: #9aacff; background: rgba(143,163,255,.22); }
+.download-report:disabled { cursor: wait; opacity: .65; }
+.file-picker { display: block; margin-top: 1rem; padding: .85rem; border: 1px dashed #54658d; border-radius: .7rem; cursor: pointer; background: rgba(84,101,141,.08); color: #d8e0f1; }
+.file-picker:hover { border-color: #91a5ff; background: rgba(143,163,255,.13); }
+.file-picker span, .file-picker small { display: block; }
+.file-picker span { font-size: .8rem; font-weight: 800; }
+.file-picker small { margin-top: .25rem; color: #93a0b6; font: .65rem 'DM Mono', monospace; }
+.file-picker input { display: none; }
+.selected-files { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .7rem; }
+.selected-files > span { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; padding: .35rem .5rem; border: 1px solid rgba(143,163,255,.3); border-radius: .4rem; color: #cdd6f4; font: .68rem 'DM Mono', monospace; overflow-wrap: anywhere; }
+.selected-files button { padding: 0 .12rem; border: 0; background: transparent; color: #fa8c9b; font-size: 1rem; line-height: 1; }
 .insight-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: .35rem; margin-bottom: .7rem; }
 .insight-summary span, .prediction-card, .metrics-details { padding: .55rem; border: 1px solid rgba(255,255,255,.09); border-radius: .45rem; color: #b8c4d9; font-size: .64rem; }
 .prediction-card p { margin: 0 0 .3rem; color: #91a5ff; font: 500 .58rem 'DM Mono', monospace; }
@@ -83,10 +95,13 @@ button { border: 0; border-radius: .65rem; cursor: pointer; font: 800 .86rem Man
 .risk-medium { color: #f0c674 !important; background-color: rgba(240,198,116,.11); }
 .risk-high { color: #fa8c9b !important; background-color: rgba(250,140,155,.11); }
 .history { margin-top: 1rem; }
-.scanrow { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1rem; padding: .8rem 0; border-top: 1px solid rgba(255,255,255,.11); }
+.scanrow { display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 1rem; padding: .8rem 0; border-top: 1px solid rgba(255,255,255,.11); }
 .scanicon { display: grid; width: 2.1rem; height: 2.1rem; place-items: center; border-radius: .55rem; background: #222e4f; color: #aab9ff; font-size: 1.2rem; }
 .scanrow strong { display: block; font-size: .76rem; }
 .scanrow > b { font-size: .95rem; }
+.open-scan { padding: .42rem .6rem; background: rgba(143,163,255,.13); color: #cdd6f4; font-size: .7rem; }
+.open-scan:hover:not(:disabled) { background: rgba(143,163,255,.25); }
+.open-scan:disabled { cursor: wait; opacity: .65; }
 .emptytext { padding: 2rem 0; color: #93a0b6; font-size: .8rem; text-align: center; }
 .callback { display: grid; min-height: 80vh; place-items: center; }
 .callback .panel { max-width: 32rem; padding: 2rem; text-align: center; }

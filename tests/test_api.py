@@ -26,6 +26,18 @@ def test_login_and_submit_scan():
         assert result.json()["overall_risk_level"] == "low"
 
 
+def test_scan_rejects_unsupported_file_extensions():
+    with TestClient(app) as client:
+        _, token = register_developer(client)
+        response = client.post(
+            "/api/v1/scans",
+            headers=authorization(token),
+            json={"repository_name": "unsupported-file", "files": [{"filename": "notes.txt", "content": "not source code"}]},
+        )
+        assert response.status_code == 422
+        assert "Only .py, .js, .jsx, .ts, .tsx, and .java" in response.text
+
+
 def test_register_duplicate_and_current_user():
     with TestClient(app) as client:
         email, token = register_developer(client)
@@ -95,6 +107,9 @@ def test_scan_history_is_isolated_between_developers():
         scan = client.post("/api/v1/scans", headers=authorization(first_token), json={"repository_name": "private-repository", "files": [{"filename": "private.py", "content": "print('private')"}]})
         assert scan.status_code == 200
         scan_id = scan.json()["id"]
+        saved_scan = client.get(f"/api/v1/scans/{scan_id}", headers=authorization(first_token))
+        assert saved_scan.status_code == 200
+        assert saved_scan.json()["source_files"] == [{"filename": "private.py", "content": "print('private')"}]
         assert client.get(f"/api/v1/scans/{scan_id}", headers=authorization(second_token)).status_code == 404
         history = client.get("/api/v1/scans", headers=authorization(second_token))
         assert history.status_code == 200

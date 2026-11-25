@@ -52,6 +52,14 @@ class SourceFile(BaseModel):
     filename: str = Field(min_length=1, max_length=255)
     content: str = Field(max_length=200_000)
 
+    @field_validator("filename")
+    @classmethod
+    def allow_supported_source_extensions(cls, filename: str) -> str:
+        supported_extensions = (".py", ".js", ".jsx", ".ts", ".tsx", ".java")
+        if not filename.lower().endswith(supported_extensions):
+            raise ValueError("Only .py, .js, .jsx, .ts, .tsx, and .java source files are supported")
+        return filename
+
 class ScanRequest(BaseModel):
     repository_name: str = Field(min_length=1, max_length=255)
     files: list[SourceFile] = Field(min_length=1, max_length=25)

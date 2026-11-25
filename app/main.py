@@ -28,8 +28,16 @@ app = FastAPI(
     ],
 )
 allowed_hosts = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver,api").split(",") if host.strip()]
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost,http://localhost:3000,http://localhost:8081",
+    ).split(",")
+    if origin.strip()
+]
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost", "https://localhost", "http://localhost:3000", "http://localhost:8081"], allow_credentials=True, allow_methods=["GET", "POST", "OPTIONS"], allow_headers=["Authorization", "Content-Type"])
+app.add_middleware(CORSMiddleware, allow_origins=cors_origins, allow_credentials=True, allow_methods=["GET", "POST", "OPTIONS"], allow_headers=["Authorization", "Content-Type"])
 
 @app.middleware("http")
 async def add_api_security_headers(request, call_next):
@@ -49,6 +57,9 @@ def initialise_database():
         with engine.begin() as connection:
             connection.execute(text("ALTER TABLE users ADD COLUMN google_id VARCHAR(255)"))
             connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_google_id ON users (google_id)"))
+    if "source_json" not in {column["name"] for column in inspector.get_columns("scans")}:
+        with engine.begin() as connection:
+            connection.execute(text("ALTER TABLE scans ADD COLUMN source_json TEXT"))
     db = SessionLocal()
     try:
         for email, password, role in [("admin@example.com", os.getenv("ADMIN_PASSWORD", "ChangeMe123!"), "admin"), ("developer@example.com", os.getenv("DEVELOPER_PASSWORD", "ChangeMe123!"), "developer")]:
@@ -111,8 +122,9 @@ def google_callback(code: str, state: str, db: Session = Depends(get_db)):
 
 @app.post("/api/v1/scans", tags=["scans"], summary="Analyze source files", description="Runs explainable heuristic bug prediction, code-quality checks, and security-pattern detection. Use Swagger Authorize with a Bearer JWT first.", responses={401: {"description": "JWT is missing, expired, or invalid"}})
 def create_scan(payload: ScanRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    report = analyze_project([item.model_dump() for item in payload.files])
-    scan = Scan(repository_name=payload.repository_name, owner_email=user.email, overall_risk=report["overall_risk_level"], risk_score=report["overall_risk_score"], report_json=json.dumps(report))
+    source_files = [item.model_dump() for item in payload.files]
+    report = analyze_project(source_files)
+    scan = Scan(repository_name=payload.repository_name, owner_email=user.email, overall_risk=report["overall_risk_level"], risk_score=report["overall_risk_score"], report_json=json.dumps(report), source_json=json.dumps(source_files))
     db.add(scan); db.commit(); db.refresh(scan)
     return {"id": scan.id, "repository_name": scan.repository_name, "created_at": scan.created_at, **report}
 
@@ -125,7 +137,7 @@ def list_scans(user: User = Depends(get_current_user), db: Session = Depends(get
 def scan_detail(scan_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     scan = db.get(Scan, scan_id)
     if not scan or (user.role != "admin" and scan.owner_email != user.email): raise HTTPException(status_code=404, detail="Scan not found")
-    return {"id": scan.id, "repository_name": scan.repository_name, "owner_email": scan.owner_email, "created_at": scan.created_at, **json.loads(scan.report_json)}
+    return {"id": scan.id, "repository_name": scan.repository_name, "owner_email": scan.owner_email, "created_at": scan.created_at, "source_files": json.loads(scan.source_json) if scan.source_json else [], **json.loads(scan.report_json)}
 
 @app.get("/api/v1/admin/audit", response_model=AuditResponse, tags=["administration"], summary="Get administrator audit totals", responses={403: {"description": "Administrator role required"}})
 def audit(user: User = Depends(require_admin), db: Session = Depends(get_db)):

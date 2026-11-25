@@ -26,6 +26,8 @@ See [the Phase 1 checklist](docs/PHASE-1-CHECKLIST.md) for the exact environment
 See [the Docker guide](docs/PHASE-8-DOCKER.md) for container setup and verification.
 See [the Jenkins guide](docs/PHASE-9-JENKINS.md) for CI/CD setup, branch promotion and webhook verification.
 See [the security hardening guide](docs/PHASE-10-SECURITY.md) for implemented controls, scanning policy and verification.
+See [the GitHub webhook guide](docs/PHASE-11-WEBHOOKS.md) for automatic Jenkins builds from `zk` pushes.
+See [the cloud deployment guide](docs/PHASE-12-CLOUD-DEPLOYMENT.md) for Vercel + Render deployment and production OAuth configuration.
 
 ## Capstone evidence
 

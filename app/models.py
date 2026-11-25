@@ -19,4 +19,5 @@ class Scan(Base):
     overall_risk: Mapped[str] = mapped_column(String(20))
     risk_score: Mapped[int] = mapped_column(Integer)
     report_json: Mapped[str] = mapped_column(Text)
+    source_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
