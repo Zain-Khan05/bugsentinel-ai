@@ -9,9 +9,9 @@ DevSecOps prototype for bug-risk prediction, code-quality checks and security fi
 docker compose up --build
 ```
 
-Open `https://localhost` (accept the local certificate warning) or `https://localhost/docs` for Swagger. Default user: `developer@example.com` / `ChangeMe123!`.
+Open `http://localhost:8081` or `http://localhost:8081/docs` for Swagger. Default user: `developer@example.com` / `ChangeMe123!`.
 
-Docker Desktop must be running. The Nginx HTTPS configuration expects local certificate files in `nginx/certs/`; do not commit certificates or `.env` files.
+Docker Desktop must be running. The local Docker stack uses HTTP at port 8081; configure HTTPS with a real certificate during cloud deployment. Do not commit `.env` files.
 
 For frontend development, run `npm install` and `npm run dev` from the `frontend` folder. Next.js proxies `/api/*` requests to FastAPI at `http://localhost:8000` by default; set the local `BACKEND_API_URL` environment variable only if your backend uses another address.
 
@@ -19,10 +19,11 @@ For frontend development, run `npm install` and `npm run dev` from the `frontend
 
 ```text
 Next.js (localhost:3000) → FastAPI (localhost:8000) → SQLite/PostgreSQL
-Docker deployment: Nginx → Next.js / FastAPI → PostgreSQL
+Docker deployment: Nginx (localhost:8081) → Next.js / FastAPI → PostgreSQL
 ```
 
 See [the Phase 1 checklist](docs/PHASE-1-CHECKLIST.md) for the exact environment, dependency, Git, and GitHub setup steps.
+See [the Docker guide](docs/PHASE-8-DOCKER.md) for container setup and verification.
 
 ## Capstone evidence
 
