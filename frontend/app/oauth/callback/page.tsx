@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 export default function OAuthCallback() {
   const [message, setMessage] = useState('Completing secure Google sign-in…');
