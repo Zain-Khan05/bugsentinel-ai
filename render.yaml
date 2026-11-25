@@ -1,7 +1,7 @@
 services:
   - type: web
     name: bugsentinel-api
-    branch: master
+    branch: zk
     autoDeploy: true
     runtime: docker
     dockerfilePath: ./Dockerfile

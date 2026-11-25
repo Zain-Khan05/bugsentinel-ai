@@ -28,7 +28,7 @@ pipeline {
       }
     }
 
-    stage('Backend: install and test') {
+    stage('Backend: unit and API tests') {
       steps {
         script {
           if (isUnix()) {
@@ -42,7 +42,12 @@ pipeline {
             '''
           } else {
             bat '''@echo on
-              py -3 -m venv .jenkins-venv
+              where py >nul 2>nul
+              if %ERRORLEVEL% EQU 0 (
+                py -3 -m venv .jenkins-venv
+              ) else (
+                python -m venv .jenkins-venv
+              )
               call .jenkins-venv\\Scripts\\activate.bat
               python -m pip install --upgrade pip
               python -m pip install -r requirements.txt

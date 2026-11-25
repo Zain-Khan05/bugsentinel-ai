@@ -13,7 +13,7 @@ Vercel manages HTTPS for the frontend. Render manages HTTPS for the API. The bro
 
 ## Before starting
 
-- [ ] Commit, test, and promote the current work through `zk` and `staging` into `master` before creating production services.
+- [ ] Commit and push the current verified work to the production branch, `zk`.
 - [ ] Confirm `python -m pytest` and `npm run build` still pass locally.
 - [ ] Never commit `.env`, Google OAuth secrets, JWT secrets, or database passwords.
 - [ ] Deploy the API/database first; its public URL is needed for Vercel and Google OAuth.
@@ -21,9 +21,9 @@ Vercel manages HTTPS for the frontend. Render manages HTTPS for the API. The bro
 ## A. Deploy FastAPI and PostgreSQL on Render
 
 1. Create an account at [Render](https://render.com/) and connect GitHub.
-2. Select **New** → **Blueprint** and select `Zain-Khan05/bugsentinel-ai`, branch `master`.
+2. Select **New** → **Blueprint** and select `Zain-Khan05/bugsentinel-ai`, branch `zk`.
 3. Render reads the repository's `render.yaml`. Create the Blueprint and wait for both `bugsentinel-api` and `bugsentinel-db` to be provisioned.
-   The Blueprint explicitly tracks `master` and has automatic deployment enabled: a new push to `master` redeploys the API, while pushes to `zk` or `staging` do not change the live API.
+   The Blueprint explicitly tracks `zk` and has automatic deployment enabled: a new push to `zk` redeploys the API.
 4. Open the `bugsentinel-api` service → **Environment**. Set these values:
 
 | Key | Value |
@@ -50,7 +50,7 @@ Do not expose Render's database connection string in Vercel or in client-side va
 
 ## B. Deploy Next.js on Vercel
 
-1. Create an account at [Vercel](https://vercel.com/) and import the same GitHub repository. Choose `master` as the production branch during import, or set it afterwards in **Settings** → **Environments** → **Production** → **Branch Tracking**.
+1. Create an account at [Vercel](https://vercel.com/) and import the same GitHub repository. Choose `zk` as the production branch during import, or set it afterwards in **Settings** → **Environments** → **Production** → **Branch Tracking**.
 2. In **Configure Project**, set **Root Directory** to `frontend`.
 3. Leave the framework preset as **Next.js**.
 4. Under **Environment Variables**, set this build-time variable for Production and Preview:
@@ -97,11 +97,10 @@ Keep the localhost entries as well, so local development continues working. Save
 
 The free tiers are good for a capstone demonstration, not production. Render free services may sleep while idle, so the first request can be slow. Vercel Hobby is designed for personal/non-commercial projects. See the providers' current documentation before a final evaluation demo.
 
-## Production branch strategy
+## Current production branch strategy
 
-- Push active work to `zk`.
-- Test `zk` locally and with a manual Jenkins **Build Now** run.
-- Promote tested work from `zk` to `staging` for team review.
-- Promote `staging` to `master` only after manual and Jenkins checks pass.
-- Render tracks `master` only, so it rebuilds the API/database integration after each `master` push.
-- Vercel Production tracks `master` only, so it rebuilds the live Next.js frontend after each `master` push. Other branches can create private Preview deployments, but they never replace the production URL.
+- `zk` is the repository default and production branch.
+- Test `zk` locally and with a manual Jenkins **Build Now** run before pushing it.
+- Render tracks `zk` only, so it rebuilds the API/database integration after each `zk` push.
+- Vercel Production tracks `zk` only, so it rebuilds the live Next.js frontend after each `zk` push.
+- If you later create `staging` and `master`, update both provider branch settings after the new release process has been tested.
